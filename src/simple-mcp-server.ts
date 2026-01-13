@@ -1,4 +1,5 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+const { Request, Response } = express;
 import * as z from 'zod/v4';
 
 const app = express();
