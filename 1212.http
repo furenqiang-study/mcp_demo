@@ -1,0 +1,32 @@
+### GET request to example server
+POST localhost:8000/mcp
+Content-Type: application/json
+
+{
+  "method": "tools/call",
+  "params": {
+    "name": "mysql数据库查询",
+    "arguments": {
+      "sql": "SELECT count(1) FROM b_st_pptn_r",
+      "host": "192.168.110.137",
+      "dbname": "tchdc",
+      "user": "root",
+      "password": "0NdcL03EpMeCX9qe",
+      "port": 63305
+    }
+  }
+}
+
+### 新安江
+POST localhost:8000/mcp
+Content-Type: application/json
+
+{
+  "method": "tools/call",
+  "params": {
+    "name": "新安江模型(横山水库)",
+    "arguments": {
+      "param": "{\"P\": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], \"TM\": 24}"
+    }
+  }
+}

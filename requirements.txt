@@ -1,0 +1,12 @@
+requests==2.32.4
+pillow==10.4.0
+psutil==7.2.1
+uvicorn==0.33.0
+fastapi==0.124.4
+httpx==0.28.1
+mcp==1.25.0
+pymysql==1.1.2
+psycopg2==2.9.11
+numpy==2.2.6
+pandas==2.3.3
+sqlalchemy==2.0.45

@@ -1,61 +1,52 @@
-# MCP 标准化工具 Demo
+# MCP 服务器 Python 版
 
-这是一个基于 Node.js 和 TypeScript 开发的 Model Context Protocol (MCP) 标准化工具演示项目。
+这是一个基于 Python 开发的 Model Context Protocol (MCP) 服务器项目，提供了多种实用工具供 AI 代理调用。
 
-## 功能说明
+## 项目概述
 
-该项目实现了一个 MCP 服务器，提供了数字提取和图表汇总功能。主要功能包括：
+该项目实现了一个完整的 MCP 服务器，支持与 AI 代理进行交互，提供了多种工具服务。主要功能包括：
 
-- 从文本中提取数字
-- 统计数字出现频率
-- 生成图表数据（支持柱状图、饼图、折线图）
-- 遵循 MCP 协议，支持与 AI 代理进行交互
+- 地址编码转换
+- 林业码查询
+- GFS 数据转 TIF 格式
+- 数据库查询（MySQL/PostgreSQL）
+- 降雨预报
+- 字符串转数组
+- 图片标注
+- 水库水位库容互查
+- 天气查询
+- 新安江模型计算
 
 ## 技术栈
 
-- **Node.js** - 运行环境
-- **TypeScript** - 编程语言
-- **Express.js** - Web 框架
-- **Zod** - Schema 验证库
-- **@modelcontextprotocol/sdk** - MCP SDK
+- **Python** - 主要开发语言
+- **FastAPI** - Web 框架
+- **uvicorn** - ASGI 服务器
+- **mcp.server** - MCP 服务器 SDK
 
 ## 安装步骤
 
 ### 1. 克隆或进入项目目录
 
 ```bash
-d: cd work\MyVueProject\2025\my_mcp_demo
+cd D:\work\MyVueProject\2025\my_mcp_demo
 ```
 
 ### 2. 安装依赖
 
 ```bash
-npm install
+pip install -r requirements.txt
 ```
 
 ## 使用方法
 
-### 启动服务
-
-#### 开发模式（使用 ts-node）
+### 启动服务器
 
 ```bash
-npm run dev
+python server.py
 ```
 
-#### 编译并启动（生产模式）
-
-```bash
-# 编译 TypeScript 代码
-npm run build
-
-# 启动编译后的代码
-npm start
-```
-
-服务启动后，会在以下地址运行：
-- MCP 端点：http://localhost:3000/mcp
-- 健康检查：http://localhost:3000/health
+服务器将在 `http://localhost:8000` 上运行。
 
 ### API 接口
 
@@ -108,88 +99,79 @@ Content-Type: application/json
   "id": "3",
   "method": "tools/call",
   "params": {
-    "name": "extract_numbers",
+    "name": "地理编码",
     "arguments": {
-      "content": "测试数据 111、222、333",
-      "chartType": "bar"
+      "address": "北京市海淀区中关村"
     }
   }
 }
 ```
 
-调用数字提取和图表汇总工具。
+调用指定工具并返回结果。
 
-## 工具列表
+## 工具示例：地理编码
 
-### extract_numbers
+### 功能说明
 
-**名称**：extract_numbers
-**标题**：数字提取与图表汇总
-**描述**：检查用户输入的内容中是否有数字，如果有，就将数字都提取出来，用图表进行汇总
+将中文地址转换为地理坐标（经纬度）。
 
-**输入参数**：
-- `content` (string)：要检查的用户输入内容
-- `chartType` (string, 可选)：图表类型，支持 "bar"、"pie"、"line"，默认为 "bar"
+### 输入参数
 
-**输出结果**：
-- 提取的数字列表
-- 数字出现频率统计
-- 生成的图表数据
+- `address` (string)：要编码的中文地址
 
-## 开发说明
+### 输出结果
 
-### 项目结构
+- 包含经纬度信息的地理编码结果
+
+### 调用示例
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "123",
+  "method": "tools/call",
+  "params": {
+    "name": "地理编码",
+    "arguments": {
+      "address": "北京市海淀区中关村"
+    }
+  }
+}
+```
+
+## 项目结构
 
 ```
 my_mcp_demo/
-├── src/
-│   └── simple-mcp-server.ts  # 主 MCP 服务器实现
-├── dist/                      # 编译后的 JavaScript 文件
-├── package.json               # 项目配置
-├── tsconfig.json              # TypeScript 配置
-└── README.md                  # 项目说明文档
+├── server.py                    # 主 MCP 服务器
+├── address_encode.py            # 地址编码工具
+├── forestry_code_query.py       # 林业码查询工具
+├── gfsToTif.py                  # GFS 转 TIF 工具
+├── mysql_db_tool.py             # MySQL 数据库查询工具
+├── pg_db_tool.py                # PostgreSQL 数据库查询工具
+├── rain_forecast.py             # 降雨预报工具
+├── strToArray.py                # 字符串转数组工具
+├── tag_images.py                # 图片标注工具
+├── water_height_capacity.py     # 水库水位库容互查工具
+├── weather_query.py             # 天气查询工具
+├── xinanjiang_model.py          # 新安江模型计算工具
+├── requirements.txt             # 依赖列表
+├── dockerfile                   # Docker 配置
+└── README.md                    # 项目说明文档
 ```
 
-### 编译代码
+## Docker 部署
+
+### 1. 构建镜像
 
 ```bash
-npm run build
+docker build -t mcp-server .
 ```
 
-### 代码检查
+### 2. 运行容器
 
 ```bash
-# 检查 TypeScript 类型
-npm run typecheck
-
-# 检查代码风格
-npm run lint
-```
-
-## MCP 协议
-
-本项目遵循 MCP (Model Context Protocol) 协议，该协议用于 AI 代理与外部工具进行交互。
-
-主要支持的 MCP 方法：
-- `initialize` - 初始化连接
-- `tools/list` - 获取工具列表
-- `tools/call` - 调用工具
-
-## 部署
-
-### 本地部署
-
-按照上述使用方法启动服务即可。
-
-### 生产部署
-
-1. 编译代码：`npm run build`
-2. 使用 PM2 或其他进程管理器启动服务：
-
-```bash
-npm install -g pm2
-npm run build
-npm start
+docker run -p 8000:8000 mcp-server
 ```
 
 ## 许可证
