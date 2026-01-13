@@ -1,0 +1,25 @@
+{
+  "name": "my_mcp_demo",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/simple-mcp-server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/simple-mcp-server.js",
+    "dev": "ts-node src/simple-mcp-server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.2"
+  }
+}
