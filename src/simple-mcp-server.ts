@@ -100,6 +100,75 @@ const tools = {
         return errorResult;
       }
     }
+  },
+  text_analyzer: {
+    title: '文本分析工具',
+    description: '分析文本内容，统计字数、词数、句子数等信息',
+    inputSchema: z.object({
+      content: z.string().describe('要分析的文本内容'),
+      language: z.enum(['zh', 'en']).optional().describe('文本语言，默认为中文')
+    }),
+    execute: async (params: any) => {
+      const { content, language = 'zh' } = params;
+
+      // 添加调用日志
+      console.log(`[MCP] 调用 text_analyzer 工具`);
+      console.log(`[MCP] 输入参数: content=${content.substring(0, 50)}..., language=${language}`);
+
+      try {
+        // 统计字数
+        const charCount = content.length;
+
+        // 统计词数
+        let wordCount = 0;
+        if (language === 'zh') {
+          // 中文按字符统计
+          wordCount = content.replace(/\s/g, '').length;
+        } else {
+          // 英文按空格分割统计
+          wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+        }
+
+        // 统计句子数
+        const sentenceCount = content.split(/[.!?。！？]/).filter(sentence => sentence.trim().length > 0).length;
+
+        // 统计段落数
+        const paragraphCount = content.split(/\n+/).filter(paragraph => paragraph.trim().length > 0).length;
+
+        // 提取关键词（简单实现）
+        let keywords: string[] = [];
+        if (language === 'zh') {
+          // 简单的中文关键词提取
+          keywords = content.match(/[\u4e00-\u9fa5]{2,}/g)?.slice(0, 5) || [];
+        } else {
+          // 简单的英文关键词提取
+          keywords = content.match(/\b\w{3,}\b/g)?.slice(0, 5) || [];
+        }
+
+        const result = {
+          success: true,
+          charCount,
+          wordCount,
+          sentenceCount,
+          paragraphCount,
+          language,
+          keywords
+        };
+
+        // 添加结果日志
+        console.log(`[MCP] text_analyzer 工具执行成功`);
+        console.log(`[MCP] 分析结果: 字符数=${charCount}, 词数=${wordCount}, 句子数=${sentenceCount}, 段落数=${paragraphCount}`);
+
+        return result;
+      } catch (error) {
+        const errorResult = { success: false, error: `Failed to analyze text: ${(error as Error).message}` };
+
+        // 添加错误日志
+        console.error(`[MCP] text_analyzer 工具执行失败: ${(error as Error).message}`);
+
+        return errorResult;
+      }
+    }
   }
 };
 
@@ -192,27 +261,58 @@ app.post('/mcp', async (req: Request, res: Response) => {
       jsonrpc: '2.0',
       id,
       result: {
-        tools: Object.entries(tools).map(([name, tool]) => ({
-          name,
-          title: tool.title,
-          description: tool.description,
-          inputSchema: {
+        tools: Object.entries(tools).map(([name, tool]) => {
+          // 转换Zod schema为JSON schema
+          let inputSchema: any = {
             type: "object",
-            properties: {
-              content: {
-                type: "string",
-                description: "要检查的用户输入内容"
+            properties: {},
+            required: []
+          };
+
+          // 基于工具类型生成相应的inputSchema
+          if (name === 'extract_numbers') {
+            inputSchema = {
+              type: "object",
+              properties: {
+                content: {
+                  type: "string",
+                  description: "要检查的用户输入内容"
+                },
+                chartType: {
+                  type: "string",
+                  enum: ["bar", "pie", "line"],
+                  description: "图表类型，默认为柱状图",
+                  default: "bar"
+                }
               },
-              chartType: {
-                type: "string",
-                enum: ["bar", "pie", "line"],
-                description: "图表类型，默认为柱状图",
-                default: "bar"
-              }
-            },
-            required: ["content"]
+              required: ["content"]
+            };
+          } else if (name === 'text_analyzer') {
+            inputSchema = {
+              type: "object",
+              properties: {
+                content: {
+                  type: "string",
+                  description: "要分析的文本内容"
+                },
+                language: {
+                  type: "string",
+                  enum: ["zh", "en"],
+                  description: "文本语言，默认为中文",
+                  default: "zh"
+                }
+              },
+              required: ["content"]
+            };
           }
-        }))
+
+          return {
+            name,
+            title: tool.title,
+            description: tool.description,
+            inputSchema
+          };
+        })
       }
     });
   }
